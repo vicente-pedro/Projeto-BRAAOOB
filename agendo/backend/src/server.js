@@ -3,16 +3,15 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const { initDb } = require('./initDb');
+const { setDbReady, isDbReady, getDbError } = require('./dbState');
 const { mapDbError } = require('./dbErrors');
+const requireDb = require('./middleware/requireDb');
 const tasksRouter = require('./routes/tasks');
 const categoriesRouter = require('./routes/categories');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
-
-let dbReady = false;
-let dbInitError = null;
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -34,20 +33,14 @@ app.use(
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
+  const ready = isDbReady();
   res.json({
-    status: dbReady ? 'ok' : 'degraded',
+    status: ready ? 'ok' : 'degraded',
     app: 'Agendo API',
-    database: dbReady ? 'connected' : 'error',
-    message: dbReady ? undefined : mapDbError(dbInitError),
+    database: ready ? 'connected' : 'error',
+    message: ready ? undefined : mapDbError(getDbError()),
   });
 });
-
-function requireDb(req, res, next) {
-  if (dbReady) return next();
-  res.status(503).json({
-    error: mapDbError(dbInitError),
-  });
-}
 
 app.use('/api/tasks', requireDb, tasksRouter);
 app.use('/api/categories', requireDb, categoriesRouter);
@@ -69,18 +62,20 @@ app.use((err, _req, res, _next) => {
 async function start() {
   try {
     await initDb();
-    dbReady = true;
-    console.log('Banco de dados conectado.');
+    setDbReady(true);
+    console.log('Banco de dados conectado e inicializado.');
   } catch (err) {
-    dbInitError = err;
-    console.error('Falha ao inicializar banco:', mapDbError(err));
-    if (isProd) process.exit(1);
+    setDbReady(false, err);
+    console.error('⚠ Banco indisponível:', mapDbError(err));
+    console.error('  A API sobe mesmo assim. Na pasta agendo, execute:');
+    console.error('  docker compose up -d');
+    console.error('  Depois confira DB_PASSWORD=agendo em backend/.env');
   }
 
   app.listen(PORT, () => {
-    console.log(`Agendo API rodando na porta ${PORT}`);
-    if (!dbReady) {
-      console.log('API no ar, mas o MySQL precisa ser configurado (veja README).');
+    console.log(`Agendo API rodando em http://localhost:${PORT}`);
+    if (!isDbReady()) {
+      console.log('  Rotas /api retornam 503 até o MySQL conectar.');
     }
   });
 }

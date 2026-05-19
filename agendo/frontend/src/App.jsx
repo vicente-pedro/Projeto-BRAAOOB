@@ -165,7 +165,7 @@ export default function App() {
     <div className="app">
       {error && (
         <div className="app-error" role="alert">
-          <strong>Erro:</strong> {error}. Verifique se o backend e o MySQL estão rodando.
+          <strong>Erro:</strong> {error}
         </div>
       )}
       <Header

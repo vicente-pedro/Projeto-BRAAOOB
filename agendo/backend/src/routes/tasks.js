@@ -1,5 +1,7 @@
 const express = require('express');
 const pool = require('../db');
+const { sendDbError } = require('../dbErrors');
+const { sendDbError } = require('../dbErrors');
 
 const router = express.Router();
 
@@ -108,8 +110,7 @@ router.get('/', async (req, res) => {
 
     res.status(400).json({ error: 'Informe date ou year/month ou start/end' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao buscar tarefas' });
+    sendDbError(res, err, 'Erro ao buscar tarefas');
   }
 });
 
@@ -124,8 +125,7 @@ router.get('/stats', async (_req, res) => {
     );
     res.json(rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+    sendDbError(res, err, 'Erro ao buscar estatísticas');
   }
 });
 
@@ -157,8 +157,7 @@ router.post('/', async (req, res) => {
     const [rows] = await pool.query(`${TASK_SELECT} WHERE t.id = ?`, [result.insertId]);
     res.status(201).json(normalizeTask(rows[0]));
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao criar tarefa' });
+    sendDbError(res, err, 'Erro ao criar tarefa');
   }
 });
 
@@ -205,8 +204,7 @@ router.put('/:id', async (req, res) => {
     if (!rows.length) return res.status(404).json({ error: 'Tarefa não encontrada' });
     res.json(normalizeTask(rows[0]));
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao atualizar tarefa' });
+    sendDbError(res, err, 'Erro ao atualizar tarefa');
   }
 });
 
@@ -234,8 +232,7 @@ router.patch('/:id', async (req, res) => {
     if (!rows.length) return res.status(404).json({ error: 'Tarefa não encontrada' });
     res.json(normalizeTask(rows[0]));
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao atualizar tarefa' });
+    sendDbError(res, err, 'Erro ao atualizar tarefa');
   }
 });
 
@@ -247,8 +244,7 @@ router.delete('/:id', async (req, res) => {
     }
     res.status(204).send();
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao excluir tarefa' });
+    sendDbError(res, err, 'Erro ao excluir tarefa');
   }
 });
 

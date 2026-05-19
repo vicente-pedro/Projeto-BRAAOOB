@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../db');
+const { sendDbError } = require('../dbErrors');
 
 const router = express.Router();
 
@@ -10,8 +11,7 @@ router.get('/', async (_req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro ao buscar categorias' });
+    sendDbError(res, err, 'Erro ao buscar categorias');
   }
 });
 
