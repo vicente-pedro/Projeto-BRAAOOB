@@ -3,12 +3,16 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const { initDb } = require('./initDb');
+const { mapDbError } = require('./dbErrors');
 const tasksRouter = require('./routes/tasks');
 const categoriesRouter = require('./routes/categories');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
+
+let dbReady = false;
+let dbInitError = null;
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -30,11 +34,23 @@ app.use(
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', app: 'Agendo API' });
+  res.json({
+    status: dbReady ? 'ok' : 'degraded',
+    app: 'Agendo API',
+    database: dbReady ? 'connected' : 'error',
+    message: dbReady ? undefined : mapDbError(dbInitError),
+  });
 });
 
-app.use('/api/tasks', tasksRouter);
-app.use('/api/categories', categoriesRouter);
+function requireDb(req, res, next) {
+  if (dbReady) return next();
+  res.status(503).json({
+    error: mapDbError(dbInitError),
+  });
+}
+
+app.use('/api/tasks', requireDb, tasksRouter);
+app.use('/api/categories', requireDb, categoriesRouter);
 
 if (isProd) {
   const dist = path.join(__dirname, '../../frontend/dist');
@@ -53,14 +69,19 @@ app.use((err, _req, res, _next) => {
 async function start() {
   try {
     await initDb();
+    dbReady = true;
+    console.log('Banco de dados conectado.');
   } catch (err) {
-    console.error('Falha ao inicializar banco:', err.message);
-    process.exit(1);
+    dbInitError = err;
+    console.error('Falha ao inicializar banco:', mapDbError(err));
+    if (isProd) process.exit(1);
   }
 
   app.listen(PORT, () => {
     console.log(`Agendo API rodando na porta ${PORT}`);
-    if (isProd) console.log('Modo produção');
+    if (!dbReady) {
+      console.log('API no ar, mas o MySQL precisa ser configurado (veja README).');
+    }
   });
 }
 
