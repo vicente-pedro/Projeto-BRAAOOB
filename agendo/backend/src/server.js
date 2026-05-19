@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const { initDb } = require('./initDb');
 const tasksRouter = require('./routes/tasks');
 const categoriesRouter = require('./routes/categories');
 
@@ -9,7 +10,23 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
 
-app.use(cors());
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.some((o) => origin === o || origin.endsWith('.vercel.app'))) {
+        callback(null, true);
+      } else {
+        callback(null, allowedOrigins[0] || true);
+      }
+    },
+  })
+);
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
@@ -33,7 +50,18 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Agendo API rodando em http://localhost:${PORT}`);
-  if (isProd) console.log('Frontend em modo produção servido pela API');
-});
+async function start() {
+  try {
+    await initDb();
+  } catch (err) {
+    console.error('Falha ao inicializar banco:', err.message);
+    process.exit(1);
+  }
+
+  app.listen(PORT, () => {
+    console.log(`Agendo API rodando na porta ${PORT}`);
+    if (isProd) console.log('Modo produção');
+  });
+}
+
+start();

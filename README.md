@@ -40,6 +40,12 @@ npm run dev
 
 Documentação completa, equipe e requisitos: [agendo/docs/](agendo/docs/).
 
+## Deploy (Vercel + banco automático)
+
+O banco é criado **sozinho** quando a API sobe na nuvem. Guia passo a passo:
+
+**[agendo/docs/DEPLOY.md](agendo/docs/DEPLOY.md)** — Railway (MySQL + API) + Vercel (frontend).
+
 ## Equipe
 
 Henrique Martinelli de Godoy · Luiz Tozeti Costa · Miguel Augusto de Oliveira · Pedro Alcantara Meneses · Pedro Pereira Vicente

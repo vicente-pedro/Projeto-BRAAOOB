@@ -11,10 +11,16 @@
 
 ### Banco de dados
 
+**Local (manual):**
+
 ```bash
 mysql -u root -p < database/schema.sql
 mysql -u root -p < database/seed.sql
 ```
+
+**Local ou nuvem (automático):** com `AUTO_INIT_DB=true` no `backend/.env`, as tabelas são criadas ao iniciar a API (`npm run dev`).
+
+**Deploy:** veja [docs/DEPLOY.md](docs/DEPLOY.md) — MySQL no Railway + site na Vercel.
 
 ### Ambiente
 
