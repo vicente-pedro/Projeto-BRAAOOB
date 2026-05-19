@@ -23,7 +23,7 @@ export default function TimelineModal({ open, tasks, dateLabel, onClose }) {
               {withTime.map((t) => (
                 <div key={t.id} className={`timeline-row ${t.isCompleted ? 'done' : ''}`}>
                   <span className="timeline-time">{t.startTime}</span>
-                  <span>{t.description}</span>
+                  <span>{t.title || t.description}</span>
                 </div>
               ))}
               {withoutTime.length > 0 && (
@@ -32,7 +32,7 @@ export default function TimelineModal({ open, tasks, dateLabel, onClose }) {
                   {withoutTime.map((t) => (
                     <div key={t.id} className={`timeline-row ${t.isCompleted ? 'done' : ''}`}>
                       <span>—</span>
-                      <span>{t.description}</span>
+                      <span>{t.title || t.description}</span>
                     </div>
                   ))}
                 </>
