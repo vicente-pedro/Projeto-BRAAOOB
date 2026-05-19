@@ -5,9 +5,11 @@ export default function Header({
   selectedDate,
   totalTasks,
   onGoToday,
+  onOpenCategories,
   statusMessage,
 }) {
-  const subtitle = statusMessage || `${formatHeaderDate(selectedDate)} — tudo em dia! ✨`;
+  const subtitle =
+    statusMessage ?? `${formatHeaderDate(selectedDate)} — tudo em dia! ✨`;
 
   return (
     <header className="header">
@@ -22,7 +24,7 @@ export default function Header({
         <button type="button" className="btn-outline" onClick={onGoToday}>
           <span className="icon">↻</span> Hoje
         </button>
-        <button type="button" className="btn-outline btn-categories">
+        <button type="button" className="btn-outline btn-categories" onClick={onOpenCategories}>
           <span className="icon">🏷</span> Categorias
         </button>
         <button type="button" className="btn-outline btn-counter">

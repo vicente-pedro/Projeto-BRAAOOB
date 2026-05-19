@@ -862,3 +862,36 @@
   text-align: center;
   padding: 1rem;
 }
+
+.categories-body {
+  padding-top: 0.5rem;
+}
+
+.categories-intro {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.categories-item {
+  list-style: none;
+}
+
+.categories-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #fafbfc;
+  width: 100%;
+}

@@ -8,6 +8,8 @@ import MonthlyCalendar from './components/MonthlyCalendar';
 import TaskSidebar from './components/TaskSidebar';
 import TaskModal from './components/TaskModal';
 import TimelineModal from './components/TimelineModal';
+import CategoriesModal from './components/CategoriesModal';
+import { formatHeaderDate } from './utils/dates';
 import './styles/App.css';
 
 export default function App() {
@@ -23,6 +25,7 @@ export default function App() {
   const [modalMode, setModalMode] = useState('create');
   const [editingTask, setEditingTask] = useState(null);
   const [timelineOpen, setTimelineOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -71,20 +74,29 @@ export default function App() {
 
   function getStatusMessage() {
     const pending = dayTasks.filter((t) => !t.isCompleted).length;
-    if (isToday(selectedDate) && pending === 0 && dayTasks.length >= 0) {
-      return null;
+    const label = formatHeaderDate(selectedDate);
+    if (isToday(selectedDate)) {
+      if (pending === 0) return `${label} — tudo em dia! ✨`;
+      return `${label} — ${pending} tarefa${pending !== 1 ? 's' : ''} pendente${pending !== 1 ? 's' : ''}`;
     }
-    return undefined;
+    if (pending > 0) {
+      return `${label} — ${pending} pendente${pending !== 1 ? 's' : ''}`;
+    }
+    return `${label} — sem pendências`;
   }
 
   async function handleQuickAdd(text) {
-    await api.createTask({
-      title: text,
-      taskDate: dateStr,
-      priority: 'medium',
-      recurrence: 'none',
-    });
-    await refresh();
+    try {
+      await api.createTask({
+        title: text,
+        taskDate: dateStr,
+        priority: 'medium',
+        recurrence: 'none',
+      });
+      await refresh();
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   function handleOpenModal(task) {
@@ -94,14 +106,18 @@ export default function App() {
   }
 
   async function handleSave(form) {
-    if (modalMode === 'edit' && editingTask) {
-      await api.updateTask(editingTask.id, form);
-    } else {
-      await api.createTask({ ...form, taskDate: form.taskDate || dateStr });
+    try {
+      if (modalMode === 'edit' && editingTask) {
+        await api.updateTask(editingTask.id, form);
+      } else {
+        await api.createTask({ ...form, taskDate: form.taskDate || dateStr });
+      }
+      setModalOpen(false);
+      setEditingTask(null);
+      await refresh();
+    } catch (err) {
+      setError(err.message);
     }
-    setModalOpen(false);
-    setEditingTask(null);
-    await refresh();
   }
 
   async function handleToggle(task) {
@@ -156,6 +172,7 @@ export default function App() {
         selectedDate={selectedDate}
         totalTasks={totalTasks}
         onGoToday={handleGoToday}
+        onOpenCategories={() => setCategoriesOpen(true)}
         statusMessage={getStatusMessage()}
       />
       <main className="main-layout">
@@ -211,6 +228,11 @@ export default function App() {
         tasks={dayTasks}
         dateLabel={capitalizedTimeline}
         onClose={() => setTimelineOpen(false)}
+      />
+      <CategoriesModal
+        open={categoriesOpen}
+        categories={categories}
+        onClose={() => setCategoriesOpen(false)}
       />
     </div>
   );
