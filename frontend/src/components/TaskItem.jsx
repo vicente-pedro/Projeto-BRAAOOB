@@ -1,3 +1,9 @@
+const PRIORITY_LABELS = {
+  low: { label: 'Baixa', className: 'priority-low' },
+  medium: { label: 'Média', className: 'priority-medium' },
+  high: { label: 'Alta', className: 'priority-high' },
+};
+
 const CATEGORY_ICONS = {
   graduation: '🎓',
   briefcase: '💼',
@@ -34,8 +40,18 @@ export default function TaskItem({ task, onToggle, onEdit, onDelete }) {
         <span className="checkmark" />
       </label>
       <div className="task-body">
-        <p className="task-desc">{task.description}</p>
+        <p className="task-desc">{task.title || task.description}</p>
+        {task.description && task.title && (
+          <p className="task-subdesc">{task.description}</p>
+        )}
         <div className="task-meta">
+          {task.priority && (
+            <span
+              className={`task-priority ${PRIORITY_LABELS[task.priority]?.className || ''}`}
+            >
+              {PRIORITY_LABELS[task.priority]?.label || task.priority}
+            </span>
+          )}
           {task.startTime && <span className="task-time">🕐 {task.startTime}</span>}
           {task.category && (
             <span

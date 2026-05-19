@@ -6,7 +6,9 @@ export default function TaskSidebar({
   selectedDate,
   tasks,
   filter,
+  priorityFilter,
   onFilterChange,
+  onPriorityFilterChange,
   onQuickAdd,
   onOpenModal,
   onToggle,
@@ -20,8 +22,9 @@ export default function TaskSidebar({
   const completed = tasks.filter((t) => t.isCompleted).length;
 
   const filtered = tasks.filter((t) => {
-    if (filter === 'active') return !t.isCompleted;
-    if (filter === 'completed') return t.isCompleted;
+    if (filter === 'active' && t.isCompleted) return false;
+    if (filter === 'completed' && !t.isCompleted) return false;
+    if (priorityFilter !== 'all' && t.priority !== priorityFilter) return false;
     return true;
   });
 
@@ -78,6 +81,24 @@ export default function TaskSidebar({
               onClick={() => onFilterChange(f)}
             >
               {f === 'all' ? 'Todas' : f === 'active' ? 'Ativas' : 'Concluídas'}
+            </button>
+          ))}
+        </div>
+        <div className="task-filters priority-filters">
+          <span className="filter-label">Prioridade:</span>
+          {[
+            { value: 'all', label: 'Todas' },
+            { value: 'high', label: 'Alta' },
+            { value: 'medium', label: 'Média' },
+            { value: 'low', label: 'Baixa' },
+          ].map((p) => (
+            <button
+              key={p.value}
+              type="button"
+              className={priorityFilter === p.value ? 'active' : ''}
+              onClick={() => onPriorityFilterChange(p.value)}
+            >
+              {p.label}
             </button>
           ))}
         </div>

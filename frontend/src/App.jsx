@@ -18,6 +18,7 @@ export default function App() {
   const [categories, setCategories] = useState([]);
   const [totalTasks, setTotalTasks] = useState(0);
   const [filter, setFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [editingTask, setEditingTask] = useState(null);
@@ -78,8 +79,9 @@ export default function App() {
 
   async function handleQuickAdd(text) {
     await api.createTask({
-      description: text,
+      title: text,
       taskDate: dateStr,
+      priority: 'medium',
       recurrence: 'none',
     });
     await refresh();
@@ -181,7 +183,9 @@ export default function App() {
           selectedDate={selectedDate}
           tasks={dayTasks}
           filter={filter}
+          priorityFilter={priorityFilter}
           onFilterChange={setFilter}
+          onPriorityFilterChange={setPriorityFilter}
           onQuickAdd={handleQuickAdd}
           onOpenModal={handleOpenModal}
           onToggle={handleToggle}

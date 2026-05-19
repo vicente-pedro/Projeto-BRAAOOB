@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
+
 const RECURRENCE_OPTIONS = [
   { value: 'none', label: 'Sem recorrência' },
   { value: 'daily', label: 'Diária' },
   { value: 'weekly', label: 'Semanal' },
   { value: 'monthly', label: 'Mensal' },
+];
+
+const PRIORITY_OPTIONS = [
+  { value: 'low', label: 'Baixa' },
+  { value: 'medium', label: 'Média' },
+  { value: 'high', label: 'Alta' },
 ];
 
 const CATEGORY_ICONS = {
@@ -23,7 +30,9 @@ export default function TaskModal({
   onClose,
   onSave,
 }) {
+  const [taskTitle, setTaskTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState('medium');
   const [taskDate, setTaskDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [categoryId, setCategoryId] = useState(null);
@@ -32,13 +41,17 @@ export default function TaskModal({
   useEffect(() => {
     if (!open) return;
     if (task) {
-      setDescription(task.description);
+      setTaskTitle(task.title || task.description || '');
+      setDescription(task.description || '');
+      setPriority(task.priority || 'medium');
       setTaskDate(task.taskDate);
       setStartTime(task.startTime || '');
       setCategoryId(task.categoryId || categories[0]?.id || null);
       setRecurrence(task.recurrence || 'none');
     } else {
+      setTaskTitle('');
       setDescription('');
+      setPriority('medium');
       setTaskDate(defaultDate);
       setStartTime('');
       setCategoryId(categories[0]?.id || null);
@@ -50,9 +63,11 @@ export default function TaskModal({
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!description.trim() || !taskDate) return;
+    if (!taskTitle.trim() || !taskDate) return;
     onSave({
-      description: description.trim(),
+      title: taskTitle.trim(),
+      description: description.trim() || null,
+      priority,
       taskDate,
       startTime: startTime || null,
       categoryId: categoryId && Number(categoryId) > 1 ? categoryId : null,
@@ -60,7 +75,7 @@ export default function TaskModal({
     });
   }
 
-  const title = mode === 'edit' ? 'Editar Tarefa' : 'Nova Tarefa';
+  const modalTitle = mode === 'edit' ? 'Editar Tarefa' : 'Nova Tarefa';
 
   return (
     <div className="modal-overlay" onClick={onClose} role="presentation">
@@ -73,7 +88,7 @@ export default function TaskModal({
       >
         <header className="modal-header">
           <h2 id="modal-title">
-            <span className="modal-icon">✏️</span> {title}
+            <span className="modal-icon">✏️</span> {modalTitle}
           </h2>
           <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
             ×
@@ -81,14 +96,33 @@ export default function TaskModal({
         </header>
         <form className="modal-body" onSubmit={handleSubmit}>
           <label className="field">
-            <span>Descrição da tarefa</span>
+            <span>Título da tarefa *</span>
+            <input
+              type="text"
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
+              required
+              placeholder="Ex.: Entregar trabalho de BD"
+            />
+          </label>
+          <label className="field">
+            <span>Descrição (opcional)</span>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              required
-              placeholder="O que precisa ser feito?"
+              placeholder="Detalhes adicionais..."
             />
+          </label>
+          <label className="field">
+            <span>Prioridade *</span>
+            <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+              {PRIORITY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </label>
           <div className="field-row">
             <label className="field">

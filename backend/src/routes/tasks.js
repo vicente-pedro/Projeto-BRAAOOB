@@ -6,7 +6,9 @@ const router = express.Router();
 const TASK_SELECT = `
   SELECT
     t.id,
+    t.title,
     t.description,
+    t.priority,
     DATE_FORMAT(t.task_date, '%Y-%m-%d') AS taskDate,
     TIME_FORMAT(t.start_time, '%H:%i') AS startTime,
     t.category_id AS categoryId,
@@ -23,7 +25,9 @@ const TASK_SELECT = `
 function normalizeTask(row) {
   return {
     id: row.id,
+    title: row.title,
     description: row.description,
+    priority: row.priority,
     taskDate: row.taskDate,
     startTime: row.startTime,
     categoryId: row.categoryId,
@@ -41,14 +45,42 @@ function normalizeTask(row) {
   };
 }
 
+function buildWhere(filters) {
+  const clauses = [];
+  const params = [];
+
+  if (filters.date) {
+    clauses.push('t.task_date = ?');
+    params.push(filters.date);
+  } else if (filters.start && filters.end) {
+    clauses.push('t.task_date BETWEEN ? AND ?');
+    params.push(filters.start, filters.end);
+  }
+
+  if (filters.status === 'active') {
+    clauses.push('t.is_completed = 0');
+  } else if (filters.status === 'completed') {
+    clauses.push('t.is_completed = 1');
+  }
+
+  if (filters.priority) {
+    clauses.push('t.priority = ?');
+    params.push(filters.priority);
+  }
+
+  const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+  return { where, params };
+}
+
 router.get('/', async (req, res) => {
-  const { date, start, end, year, month } = req.query;
+  const { date, start, end, year, month, status, priority } = req.query;
 
   try {
     if (date) {
+      const { where, params } = buildWhere({ date, status, priority });
       const [rows] = await pool.query(
-        `${TASK_SELECT} WHERE t.task_date = ? ORDER BY t.is_completed, t.start_time, t.id`,
-        [date]
+        `${TASK_SELECT} ${where} ORDER BY t.is_completed, t.priority DESC, t.start_time, t.id`,
+        params
       );
       return res.json(rows.map(normalizeTask));
     }
@@ -57,18 +89,19 @@ router.get('/', async (req, res) => {
       const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
       const lastDay = new Date(Number(year), Number(month), 0).getDate();
       const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
-
+      const { where, params } = buildWhere({ start: startDate, end: endDate, status, priority });
       const [rows] = await pool.query(
-        `${TASK_SELECT} WHERE t.task_date BETWEEN ? AND ? ORDER BY t.task_date, t.start_time`,
-        [startDate, endDate]
+        `${TASK_SELECT} ${where} ORDER BY t.task_date, t.start_time`,
+        params
       );
       return res.json(rows.map(normalizeTask));
     }
 
     if (start && end) {
+      const { where, params } = buildWhere({ start, end, status, priority });
       const [rows] = await pool.query(
-        `${TASK_SELECT} WHERE t.task_date BETWEEN ? AND ? ORDER BY t.task_date, t.start_time`,
-        [start, end]
+        `${TASK_SELECT} ${where} ORDER BY t.task_date, t.start_time`,
+        params
       );
       return res.json(rows.map(normalizeTask));
     }
@@ -97,19 +130,23 @@ router.get('/stats', async (_req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { description, taskDate, startTime, categoryId, recurrence } = req.body;
+  const { title, description, taskDate, startTime, categoryId, recurrence, priority } =
+    req.body;
 
-  if (!description?.trim() || !taskDate) {
-    return res.status(400).json({ error: 'Descrição e data são obrigatórias' });
+  const taskTitle = (title || description || '').trim();
+  if (!taskTitle || !taskDate) {
+    return res.status(400).json({ error: 'Título e data são obrigatórios' });
   }
 
   try {
     const catId = categoryId && Number(categoryId) > 1 ? categoryId : null;
     const [result] = await pool.query(
-      `INSERT INTO tasks (description, task_date, start_time, category_id, recurrence)
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO tasks (title, description, priority, task_date, start_time, category_id, recurrence)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
-        description.trim(),
+        taskTitle,
+        description?.trim() || null,
+        priority || 'medium',
         taskDate,
         startTime || null,
         catId,
@@ -127,13 +164,24 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { description, taskDate, startTime, categoryId, recurrence, isCompleted } = req.body;
+  const {
+    title,
+    description,
+    taskDate,
+    startTime,
+    categoryId,
+    recurrence,
+    priority,
+    isCompleted,
+  } = req.body;
 
   try {
     const catId = categoryId && Number(categoryId) > 1 ? categoryId : null;
     await pool.query(
       `UPDATE tasks SET
-        description = COALESCE(?, description),
+        title = COALESCE(?, title),
+        description = ?,
+        priority = COALESCE(?, priority),
         task_date = COALESCE(?, task_date),
         start_time = ?,
         category_id = ?,
@@ -141,7 +189,9 @@ router.put('/:id', async (req, res) => {
         is_completed = COALESCE(?, is_completed)
       WHERE id = ?`,
       [
-        description?.trim(),
+        title?.trim(),
+        description?.trim() || null,
+        priority,
         taskDate,
         startTime || null,
         catId,

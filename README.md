@@ -1,61 +1,66 @@
 # Agendo — Gerenciador de Tarefas
 
-Sistema de gerenciamento de tarefas com calendário semanal/mensal, categorias, recorrência e timeline — inspirado no layout das referências do projeto.
+Projeto semestral da **Equipe 05** — sistema de gerenciamento de tarefas com calendário, categorias, prioridade e recorrência.
+
+**Repositório:** [github.com/vicente-pedro/Projeto-BRAAOOB](https://github.com/vicente-pedro/Projeto-BRAAOOB)
+
+## Equipe
+
+| Integrante | RA |
+|------------|-----|
+| Henrique Martinelli de Godoy | BP3062741 |
+| Luiz Tozeti Costa | BP3061965 |
+| Miguel Augusto de Oliveira | BP3061418 |
+| Pedro Alcantara Meneses | BP3062791 |
+| Pedro Pereira Vicente | BP3062716 |
+
+## Documentação acadêmica
+
+- [docs/Equipe05_ListagemRequisitos.pdf](docs/Equipe05_ListagemRequisitos.pdf)
+- [docs/Equipe05_DiagramaCasoUso.pdf](docs/Equipe05_DiagramaCasoUso.pdf)
+- [docs/REQUISITOS.md](docs/REQUISITOS.md) — rastreabilidade RF/RNF
+- [docs/CASOS_DE_USO.md](docs/CASOS_DE_USO.md) — casos de uso
 
 ## Stack
 
-| Camada    | Tecnologia              |
-|-----------|-------------------------|
-| Frontend  | React + Vite + CSS      |
-| Backend   | Node.js + Express       |
-| Banco     | MySQL                   |
+| Camada | Tecnologia |
+|--------|------------|
+| Frontend | React + Vite + CSS |
+| Backend | Node.js + Express |
+| Banco | MySQL |
 
 ## Pré-requisitos
 
-- [Node.js](https://nodejs.org/) 18+
-- [MySQL](https://www.mysql.com/) 8+ (ou MariaDB)
+- Node.js 18+
+- MySQL 8+ (ou MariaDB)
 
-## 1. Banco de dados
+## Instalação
 
-No MySQL, execute os scripts na ordem:
+### 1. Banco de dados
 
 ```bash
 mysql -u root -p < database/schema.sql
 mysql -u root -p < database/seed.sql
 ```
 
-Isso cria o banco `agendo`, as tabelas e as categorias padrão.
+Se o banco já existia sem `title` e `priority`:
 
-## 2. Backend
+```bash
+mysql -u root -p < database/migration_v2_title_priority.sql
+```
+
+### 2. Backend
 
 ```bash
 cd backend
 copy .env.example .env
-```
-
-Edite `.env` com usuário e senha do MySQL:
-
-```env
-PORT=3001
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=sua_senha
-DB_NAME=agendo
-```
-
-Instale e inicie:
-
-```bash
 npm install
 npm run dev
 ```
 
-API em `http://localhost:3001`.
+API: `http://localhost:3001`
 
-## 3. Frontend
-
-Em outro terminal:
+### 3. Frontend
 
 ```bash
 cd frontend
@@ -63,35 +68,26 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:5173`. O Vite faz proxy de `/api` para o backend.
+App: `http://localhost:5173`
 
-## Funcionalidades
+## Requisitos atendidos
 
-- Calendário semanal e mensal com dia selecionado sincronizado
-- Painel lateral com tarefas do dia, filtros e adição rápida
-- Modal completo: descrição, data, horário, categoria e recorrência
-- Arrastar tarefas não recorrentes para outro dia (semana/mês)
-- Timeline com tarefas que têm horário
-- Logo **Agendo** (azul, amarelo, vermelho) no cabeçalho
+| ID | Funcionalidade |
+|----|----------------|
+| RF01 | Cadastrar (título, descrição, data, prioridade) |
+| RF02 | Editar tarefas |
+| RF03 | Excluir tarefas |
+| RF04 | Marcar como concluída |
+| RF05 | Listar tarefas |
+| RF06 | Definir prazos (data) |
+| RF07 | Filtrar por status e prioridade |
 
 ## Estrutura
 
 ```
-GerenciadorDeTarefas/
-├── backend/          # API Express
-├── frontend/         # React (Vite)
-├── database/         # schema.sql e seed.sql
+├── backend/       # API Express
+├── frontend/      # React (Vite)
+├── database/      # SQL schema, seed e migrations
+├── docs/          # PDFs e rastreabilidade
 └── README.md
 ```
-
-## API (resumo)
-
-| Método | Rota              | Descrição                    |
-|--------|-------------------|------------------------------|
-| GET    | /api/categories   | Lista categorias             |
-| GET    | /api/tasks?date=  | Tarefas de um dia            |
-| GET    | /api/tasks?year=&month= | Tarefas do mês        |
-| POST   | /api/tasks        | Criar tarefa                 |
-| PUT    | /api/tasks/:id    | Atualizar tarefa             |
-| PATCH  | /api/tasks/:id    | Concluir ou mover data       |
-| DELETE | /api/tasks/:id    | Excluir tarefa               |

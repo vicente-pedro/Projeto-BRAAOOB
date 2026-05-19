@@ -546,6 +546,59 @@
   word-break: break-word;
 }
 
+.task-subdesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.task-priority {
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+}
+
+.priority-low {
+  background: #ecfdf5;
+  color: #15803d;
+}
+
+.priority-medium {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.priority-high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.filter-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-right: 0.25rem;
+}
+
+.priority-filters {
+  margin-top: 0.35rem;
+}
+
+.field select {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  width: 100%;
+  background: white;
+}
+
+.field input[type='text'] {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  width: 100%;
+}
+
 .task-meta {
   display: flex;
   flex-wrap: wrap;

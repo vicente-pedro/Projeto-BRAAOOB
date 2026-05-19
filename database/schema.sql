@@ -14,7 +14,9 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE TABLE IF NOT EXISTS tasks (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  description TEXT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NULL,
+  priority ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
   task_date DATE NOT NULL,
   start_time TIME NULL,
   category_id INT NULL,
