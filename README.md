@@ -16,7 +16,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Agendo** é um sistema de gerenciamento de agendamentos desenvolvido como projeto acadêmico da disciplina de **Engenharia de Software** — Equipe 05. A plataforma oferece uma interface moderna para que prestadores de serviço e clientes possam organizar e gerenciar seus agendamentos de forma simples e eficiente.
+O **Agendo** é um sistema de gerenciamento de agendamentos desenvolvido como projeto acadêmico da disciplina de **Análise Orientada a Objetos** — Equipe 05. A plataforma oferece uma interface moderna para que prestadores de serviço e clientes possam organizar e gerenciar seus agendamentos de forma simples e eficiente.
 
 ---
 
