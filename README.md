@@ -10,7 +10,6 @@
   ![MySQL](https://img.shields.io/badge/Banco%20de%20Dados-MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
   ![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=flat-square)
 
-  [Repositório](https://github.com/vicente-pedro/Projeto-BRAAOOB) · [Documentação](https://github.com/vicente-pedro/Agendo/blob/main/agendo/docs) · [Deploy Guide](https://github.com/vicente-pedro/Agendo/blob/main/agendo/docs/DEPLOY.md)
 </div>
 
 ---
