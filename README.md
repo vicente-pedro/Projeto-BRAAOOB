@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.imgur.com/placeholder.png" alt="Agendo Logo" width="220"/>
+ <img src="./docs/logo.jpeg" alt="Agendo Logo" width="220"/>
   
   # Agendo — Sistema de Agendamento Online
 
