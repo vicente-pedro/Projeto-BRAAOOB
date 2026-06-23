@@ -41,7 +41,6 @@ O **Agendo** é um sistema de gerenciamento de agendamentos desenvolvido como pr
 | **Frontend** | React + Vite + CSS |
 | **Backend** | Node.js + Express |
 | **Banco de Dados** | MySQL |
-| **Deploy** | Railway |
 
 ---
 
@@ -104,15 +103,6 @@ npm run dev
 |---------|-----|
 | Interface (frontend) | http://localhost:5173 |
 | API (backend) | http://localhost:3001 |
-
----
-
-## ☁️ Deploy (Vercel + Railway)
-
-O banco de dados é criado automaticamente quando a API sobe na nuvem.
-
-Consulte o guia completo de deploy passo a passo:  
-📄 [`agendo/docs/DEPLOY.md`](https://github.com/vicente-pedro/Agendo/blob/main/agendo/docs/DEPLOY.md) — Railway (MySQL + API) + Vercel (frontend).
 
 ---
 
