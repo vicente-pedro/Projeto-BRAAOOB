@@ -41,7 +41,7 @@ O **Agendo** é um sistema de gerenciamento de agendamentos desenvolvido como pr
 | **Frontend** | React + Vite + CSS |
 | **Backend** | Node.js + Express |
 | **Banco de Dados** | MySQL |
-| **Deploy** | Vercel (frontend) + Railway (API + banco) |
+| **Deploy** | Railway |
 
 ---
 
