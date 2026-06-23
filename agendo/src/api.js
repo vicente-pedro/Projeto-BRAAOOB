@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://agendo-production-0cd6.up.railway.app/api';
 
 function getToken() {
   return localStorage.getItem('agendo_token');
